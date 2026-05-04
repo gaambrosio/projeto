@@ -3,7 +3,7 @@ const products = [
   {
     name: "Sensor Freestyle Libre",
     price: 299.90,
-    img: "https://via.placeholder.com/200"
+    img: "img/sensor-libre.png"
   },
   {
     name: "Kit Medidor de Glicose",

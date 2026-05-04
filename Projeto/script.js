@@ -2,22 +2,22 @@ const products = [
   {
     name: "Sensor Freestyle Libre",
     price: 299.90,
-    image: "https://via.placeholder.com/200"
+    image: "img/sensor-libre.png" 
   },
   {
-    name: "Kit Medidor de Glicose",
+    name: "Kit Medidor de Glicose - Accu-Chek",
     price: 69.00,
-    image: "https://via.placeholder.com/200"
+    image: "img/medidor-glicose.png"
   },
   {
-    name: "Agulha para Insulina",
+    name: "Agulha para Insulina - Uniqmed 6mm",
     price: 39.90,
-    image: "https://via.placeholder.com/200"
+    image: "img/agulha-insulina.png"
   },
   {
-    name: "Tiras de Glicemia",
+    name: "Tiras Glicemia - On Call Plus II",
     price: 49.90,
-    image: "https://via.placeholder.com/200"
+    image: "img/tiras-glicose.png"
   }
 ];
 
