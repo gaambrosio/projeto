@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro | Farmabete</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <a href="index.html" class="logo"><img src="logo.png" alt="Farmabete"></a>
+    </div>
+    <div class="header-center">
+        <a href="index.html" class="nav-btn">Voltar para Loja</a>
+    </div>
+    <div class="header-right">
+        <a href="carrinho.html" class="cart-btn">🛒 <span id="cart-count">0</span></a>
+    </div>
+  </header>
+
+  <section class="carrinho-container">
+    <h1 class="titulo-carrinho">Cadastro de Cliente</h1>
+    
+    <div style="background: #141A2A; padding: 40px; border-radius: 15px; max-width: 550px; margin: 0 auto; border: 1px solid #2979FF;">
+        
+        <form id="form-cadastro" style="display: flex; flex-direction: column; gap: 15px;">
+          <label>Nome Completo</label>
+          <input type="text" id="nome" placeholder="Seu nome" required style="padding: 12px; border-radius: 8px; border: 1px solid #2979FF; background: #0B0F1A; color: white;">
+          
+          <label>E-mail</label>
+          <input type="email" id="email" placeholder="exemplo@email.com" required style="padding: 12px; border-radius: 8px; border: 1px solid #2979FF; background: #0B0F1A; color: white;">
+          
+          <label>Senha</label>
+          <input type="password" id="senha" placeholder="Sua senha" required style="padding: 12px; border-radius: 8px; border: 1px solid #2979FF; background: #0B0F1A; color: white;">
+          
+          <button type="submit" class="nav-btn" style="background: #2979FF; color: white; margin-top: 10px; padding: 15px; font-size: 16px;">Finalizar Cadastro</button>
+        </form>
+
+        <div id="mensagem-status" style="display: none; text-align: center;">
+    <div style="font-size: 80px; margin-bottom: 20px;">✅</div>
+    <h2 style="color: #4CAF50;">Cadastro Concluído!</h2>
+    <p style="color: white;">Os seus dados foram guardados com sucesso.</p>
+    <button onclick="window.location.href='index.html'" class="nav-btn">VOLTAR À LOJA</button>
+</div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
