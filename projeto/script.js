@@ -1,136 +1,159 @@
-// CONFIGURAÇÃO INICIAL
 const API_URL = 'http://localhost:3000';
-let products = [];
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-// INICIALIZAÇÃO AO CARREGAR A PÁGINA
 document.addEventListener("DOMContentLoaded", () => {
-    fetchProducts();      // Carrega produtos do banco_dados.db
-    updateCartCount();    // Atualiza o ícone do carrinho
-    renderCart();         // Renderiza itens se estiver na página de carrinho
-    setupCadastro();      // Ativa a lógica de cadastro
+    // Funções de inicialização
+    updateCartCount();
+    exibirNomeUsuario();
+    
+    // Carrega produtos apenas se o container existir (na Home)
+    const productContainer = document.getElementById("product-list");
+    if (productContainer) {
+        fetchProducts();
+    }
+    
+    // Ativa a lógica do formulário de cadastro
+    setupCadastro();
 });
 
-// --- 1. BUSCAR PRODUTOS DO SERVIDOR ---
+// BUSCAR PRODUTOS DO SERVIDOR
 async function fetchProducts() {
     try {
         const response = await fetch(`${API_URL}/produtos`);
-        products = await response.json();
-        renderProducts();
-    } catch (err) {
-        console.error("Erro ao conectar com o servidor. O server.js está ligado?");
+        const products = await response.json();
         const container = document.getElementById("product-list");
-        if (container) container.innerHTML = "<p>Ligue o servidor para ver os produtos.</p>";
+        
+        if (!container) return;
+
+        container.innerHTML = products.map(p => `
+            <div class="product">
+                <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/150'">
+                <h3>${p.name}</h3>
+                <p class="price" style="color: #5393FF; font-weight: bold; font-size: 1.2em; margin: 10px 0;">
+                    R$ ${p.price.toFixed(2).replace('.', ',')}
+                </p>
+                <button class="nav-btn primary" style="width: 100%" onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">
+                    Adicionar ao Carrinho
+                </button>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error("Erro ao carregar produtos:", err);
     }
 }
 
-// --- 2. LOGICA DE CADASTRO (FIXO NA TELA) ---
+// LÓGICA DE CADASTRO UNIFICADA
 function setupCadastro() {
-    const formCadastro = document.getElementById("form-cadastro");
-    const mensagemStatus = document.getElementById("mensagem-status");
+    const form = document.getElementById("form-cadastro");
+    if (!form) return;
 
-    // Verifica se o utilizador já se cadastrou nesta sessão do navegador
-    if (localStorage.getItem("cadastroConcluido") === "true" && formCadastro) {
-        formCadastro.style.display = "none";
-        mensagemStatus.style.display = "block";
-    }
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    if (formCadastro) {
-        formCadastro.addEventListener("submit", async (e) => {
-            e.preventDefault();
+        const nome = document.getElementById("nome").value;
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
 
-            const cliente = {
-                nome: document.getElementById("nome").value,
-                email: document.getElementById("email").value,
-                senha: document.getElementById("senha").value
-            };
+        try {
+            const res = await fetch(`${API_URL}/cadastrar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, email, senha })
+            });
 
-            try {
-                const response = await fetch(`${API_URL}/cadastrar`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(cliente)
-                });
+            if (res.ok) {
+                localStorage.setItem("usuarioLogado", "true");
+                localStorage.setItem("nomeUsuario", nome);
+                
+                form.style.display = "none";
+                const msgSucesso = document.getElementById("mensagem-status");
+                if (msgSucesso) msgSucesso.style.display = "block";
 
-                const res = await response.json();
-
-                if (res.status === "Sucesso") {
-                    // Guarda o estado para não sumir ao dar F5
-                    localStorage.setItem("cadastroConcluido", "true");
-                    
-                    // Troca o formulário pela mensagem de sucesso
-                    formCadastro.style.display = "none";
-                    mensagemStatus.style.display = "block";
-                } else {
-                    alert("Erro ao realizar cadastro.");
-                }
-            } catch (err) {
-                alert("Erro ao conectar com o servidor.");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 2000);
             }
-        });
-    }
+        } catch (err) {
+            console.error("Erro no cadastro:", err);
+            alert("Erro ao conectar com o servidor.");
+        }
+    });
 }
 
-// --- 3. GESTÃO DO CARRINHO ---
-function renderProducts() {
-    const container = document.getElementById("product-list");
-    if (!container) return;
-    
-    container.innerHTML = products.map(p => `
-        <div class="product">
-            <img src="${p.img}" alt="${p.name}">
-            <h3>${p.name}</h3>
-            <p class="price">R$ ${p.price.toFixed(2)}</p>
-            <button onclick="addToCart('${p.name}', ${p.price}, '${p.img}')">Comprar</button>
-        </div>
-    `).join('');
-}
-
+// LÓGICA DO CARRINHO (ADICIONAR)
 function addToCart(name, price, img) {
-    const item = cart.find(i => i.name === name);
-    if (item) {
-        item.quantity++;
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const index = cart.findIndex(item => item.name === name);
+    
+    if (index > -1) {
+        cart[index].quantity++;
     } else {
-        cart.push({ name, price, img, quantity: 1 });
+        cart.push({ name, price: Number(price), img, quantity: 1 });
     }
-    saveCart();
-}
 
-function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
     updateCartCount();
+    alert(`${name} adicionado com sucesso!`);
 }
 
 function updateCartCount() {
-    const count = cart.reduce((sum, i) => sum + i.quantity, 0);
-    const el = document.getElementById("cart-count");
-    if (el) el.textContent = count;
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const countElement = document.getElementById("cart-count");
+    if (countElement) {
+        countElement.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
+    }
 }
 
-// Renderização específica para a página carrinho.html
-function renderCart() {
-    const container = document.querySelector(".carrinho-itens");
-    if (!container) return;
+// LÓGICA DE FINALIZAR COMPRA (NOVA)
+async function finalizarCompra() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const nomeUsuario = localStorage.getItem("nomeUsuario");
 
     if (cart.length === 0) {
-        container.innerHTML = "<h2>O seu carrinho está vazio</h2>";
+        alert("Seu carrinho está vazio!");
         return;
     }
 
-    container.innerHTML = cart.map((item, index) => `
-        <div class="item">
-            <img src="${item.img}" width="50">
-            <div class="info">
-                <h3>${item.name}</h3>
-                <p>R$ ${item.price.toFixed(2)} x ${item.quantity}</p>
-                <button onclick="removeItem(${index})">Remover</button>
-            </div>
-        </div>
-    `).join('');
+    if (!nomeUsuario) {
+        alert("Por favor, faça seu cadastro para finalizar a compra.");
+        window.location.href = "cadastro.html";
+        return;
+    }
+
+    const dadosPedido = {
+        cliente: nomeUsuario,
+        itens: cart,
+        total: cart.reduce((t, i) => t + (i.price * i.quantity), 0),
+        data: new Date().toLocaleString()
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/finalizar-pedido`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosPedido)
+        });
+
+        if (response.ok) {
+            alert("Compra realizada com sucesso!");
+            localStorage.removeItem("cart"); // Limpa o carrinho
+            window.location.href = "index.html";
+        } else {
+            alert("O servidor encontrou um erro ao processar o pedido.");
+        }
+    } catch (err) {
+        alert("Erro ao conectar com o servidor. Verifique se o Node.js está rodando.");
+    }
 }
 
-function removeItem(index) {
-    cart.splice(index, 1);
-    saveCart();
-    renderCart();
+function exibirNomeUsuario() {
+    const nome = localStorage.getItem("nomeUsuario");
+    const container = document.querySelector(".header-right");
+    
+    if (nome && container && !document.getElementById("user-greeting")) {
+        const greeting = document.createElement("span");
+        greeting.id = "user-greeting";
+        greeting.style.cssText = "color: #5393FF; margin-right: 15px; font-weight: bold;";
+        greeting.textContent = `Olá, ${nome.split(' ')[0]}`;
+        container.prepend(greeting);
+    }
 }

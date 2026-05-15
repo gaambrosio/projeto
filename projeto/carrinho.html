@@ -1,58 +1,117 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Carrinho | Farmabete</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Carrinho | Farmabete</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="background: #0B0F1A; color: white; font-family: 'Poppins', sans-serif;">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-left">
-      <a href="index.html" class="logo">
-        <img src="logo.png" alt="Farmabete">
-      </a>
-    </div>
-
-    <div class="header-center">
-      <a href="libre.html" class="nav-btn">Freestyle Libre</a>
-
-      <input type="text" placeholder="Buscar produtos..." id="search">
-
-      <a href="sibionics.html" class="nav-btn">Sibionics</a>
-    </div>
-
+<header>
+    <a href="index.html" class="logo"><img src="logo.png" alt="Farmabete" style="height: 45px;"></a>
     <div class="header-right">
-      <a href="carrinho.html" class="cart-btn">
-        🛒 <span id="cart-count">0</span>
-      </a>
+        <a href="carrinho.html" class="cart-btn">🛒 <span id="cart-count">0</span></a>
     </div>
-  </header>
+</header>
 
+<section class="carrinho-container" style="padding: 40px; max-width: 800px; margin: 0 auto;">
+    <h1>Meu Carrinho</h1>
+    
+    <div id="cart-items"></div>
 
-  <!-- CARRINHO -->
-  <section class="carrinho-container">
-
-    <h1 class="titulo-carrinho">Meu Carrinho</h1>
-
-    <div class="carrinho-content">
-
-      <!-- produtos -->
-      <div class="carrinho-itens">
-        <!-- JS vai preencher -->
-      </div>
-
-      <!-- resumo -->
-      <div class="resumo">
-        <!-- JS vai preencher -->
-      </div>
-
+    <div id="resumo-compra" style="display: none; background: #141A2A; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid #2979FF;">
+        <h3>Total: R$ <span id="valor-total">0.00</span></h3>
+        <button onclick="finalizarPedido()" style="background: #2979FF; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 15px; width: 100%;">
+            Finalizar Pedido
+        </button>
     </div>
+</section>
 
-  </section>
+<script>
+// 1. Definição da URL do Servidor (Evita o ReferenceError)
+const API_URL = 'http://localhost:3000';
 
-  <script src="script.js"></script>
+async function finalizarPedido() {
+    // Verifica se o usuário está logado (conforme seu script.js)
+    const logado = localStorage.getItem("usuarioLogado");
+    const nomeComprador = localStorage.getItem("nomeUsuario");
+
+    if (!logado) {
+        alert("Você precisa estar cadastrado para finalizar a compra!");
+        window.location.href = "cadastro.html?origem=carrinho";
+        return;
+    }
+
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) return alert("Carrinho vazio!");
+
+    // Calcula o total para enviar ao banco
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const dadosPedido = {
+        comprador: nomeComprador,
+        itens: cart,
+        total: total,
+        data: new Date().toLocaleString()
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/finalizar-pedido`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dadosPedido)
+        });
+
+        if (response.ok) {
+            localStorage.removeItem('cart');
+            alert('Pedido confirmado com sucesso!');
+            window.location.href = 'index.html';
+        } else {
+            alert('Erro ao finalizar pedido no servidor.');
+        }
+    } catch (error) {
+        console.error("Erro na requisição:", error);
+        alert('Erro de conexão: O servidor está rodando?');
+    }
+}
+
+// Lógica para carregar os itens na tela
+window.addEventListener('DOMContentLoaded', () => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const container = document.getElementById('cart-items');
+    const totalEl = document.getElementById('valor-total');
+    const countEl = document.getElementById('cart-count');
+
+    if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 20px;">Carrinho vazio.</p>';
+        return;
+    }
+
+    // Atualiza contador do header
+    if (countEl) countEl.textContent = cart.reduce((t, i) => t + i.quantity, 0);
+
+    let html = '';
+    let somaTotal = 0;
+
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        somaTotal += subtotal;
+        html += `
+            <div class="item-carrinho" style="display: flex; justify-content: space-between; align-items: center; background: #141A2A; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333;">
+                <div>
+                    <h3 style="margin: 0; color: #2979FF;">${item.name}</h3>
+                    <p style="margin: 5px 0;">Qtd: ${item.quantity} x R$ ${item.price.toFixed(2)}</p>
+                </div>
+                <p style="font-weight: bold;">R$ ${subtotal.toFixed(2)}</p>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    totalEl.textContent = somaTotal.toFixed(2);
+    document.getElementById('resumo-compra').style.display = 'block';
+});
+</script>
 
 </body>
 </html>

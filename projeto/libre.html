@@ -1,32 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
-  <title>Freestyle Libre</title>
-  <link rel="stylesheet" href="style.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Freestyle Libre</title>
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
 <header>
-  <a href="index.html" div class="logo">
-    <img src="logo.png" alt="Farmabete">
-  </a>
 
- <a onclick="window.location.href='libre.html'" class="nav-btn">
-    Freestyle Libre
- </a>
+    <a href="index.html" class="logo">
+        <img src="logo.png" alt="Farmabete">
+    </a>
 
-  <input type="text" placeholder="Buscar produtos..." id="search">
+    <a href="libre.html" class="nav-btn">
+        Freestyle Libre
+    </a>
 
+    <input type="text" placeholder="Buscar produtos..." id="search">
 
-  <a onclick="window.location.href='sibionics.html'" class="nav-btn">
-    Sibionics
-  </a>
+    <a href="sibionics.html" class="nav-btn">
+        Sibionics
+    </a>
 
-<a onclick="window.location.href='carrinho.html'"  class="cart-btn">
+    <a href="carrinho.html" class="cart-btn">
+        🛒 <span id="cart-count">0</span>
+    </a>
 
-  🛒 <span id="cart-count">0</span>
-</a></header>
-    
-  <h1>Produtos Freestyle Libre</h1>
+</header>
+
+<section style="padding: 40px;">
+
+    <h1>Produtos Freestyle Libre</h1>
+
+    <p>Lista de produtos será carregada aqui.</p>
+
+</section>
+
+<script src="carrinho-script.js"></script>
+
 </body>
 </html>

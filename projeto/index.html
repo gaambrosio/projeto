@@ -1,46 +1,54 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <meta charset="UTF-8">
-  <title>Farmabete</title>
-  <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmabete - Tecnologia em Saúde</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  
 <header>
-  <a href="index.html" div class="logo">
-    <img src="logo.png" alt="Farmabete">
-  </a>
+    <div class="header-left">
+        <a href="index.html" class="logo">
+            <img src="logo.png" alt="Farmabete">
+        </a>
+    </div>
 
- <a onclick="window.location.href='libre.html'" class="nav-btn">
-    Freestyle Libre
- </a>
+    <div class="header-center">
+        <div class="search-container">
+            <input type="text" placeholder="O que você procura hoje?" id="search">
+        </div>
+        <nav class="nav-categories">
+            <a href="libre.html" class="nav-link">Freestyle Libre</a>
+            <a href="sibionics.html" class="nav-link">Sibionics</a>
+        </nav>
+    </div>
 
-  <input type="text" placeholder="Buscar produtos..." id="search">
-
-
-  <a onclick="window.location.href='sibionics.html'" class="nav-btn">
-    Sibionics
-  </a>
-
-<a onclick="window.location.href='carrinho.html'"  class="cart-btn">
-
-  🛒 <span id="cart-count">0</span>
-</a></header>
+    <div class="header-right">
+        <a href="cadastro.html" class="nav-btn primary">Cadastrar</a>
+        <a onclick="window.location.href='carrinho.html'" class="cart-btn">
+            🛒 <span id="cart-count">0</span>
+        </a>
+    </div>
+</header>
 
 <section class="banner">
-  <div class="banner-content">
-    <h1>O melhor cuidado para sua saúde</h1>
-    <p>Tecnologia e inovação para o seu bem-estar diário.</p>
-    <img src="img/Don-saude-medicina-acessivel.png" alt="Cuidados com a sua saúde" class="bannerimg">
-  </div>
+    <div class="banner-overlay"></div>
+    <div class="banner-content">
+        <h1>O melhor cuidado para sua saúde</h1>
+        <p>Tecnologia e inovação para o seu bem-estar diário.</p>
+        <div class="banner-image-wrapper">
+            <img src="img/Don-saude-medicina-acessivel.png" alt="Cuidados com a saúde" class="bannerimg">
+        </div>
+    </div>
 </section>
 
 <section class="products">
-  <h2>Mais Vendidos</h2>
-  <div class="product-list" id="product-list"></div> 
+    <h2 class="titulo-sessao">Nossos Produtos</h2>
+    <div id="product-list" class="product-container">
+        </div>
 </section>
 
 <script src="script.js"></script>
